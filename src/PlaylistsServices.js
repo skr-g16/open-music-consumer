@@ -11,9 +11,6 @@ class PlaylistSongsService {
       values: [playlistId],
     };
     const playlistResult = await this._pool.query(playlistQuery);
-    if (!playlistResult.rowCount) {
-      throw new NotFoundError("Playlist tidak ditemukan");
-    }
     const songQuery = {
       text: `SELECT songs.id, songs.title, songs.performer
             FROM playlist_songs
@@ -22,10 +19,13 @@ class PlaylistSongsService {
       values: [playlistId],
     };
     const songResult = await this._pool.query(songQuery);
-    return {
-      ...playlistResult.rows[0],
-      songs: songResult.rows,
+    const result = {
+      playlist: {
+        ...playlistResult.rows[0],
+        songs: songResult.rows,
+      },
     };
+    return result;
   }
 }
 module.exports = PlaylistSongsService;
